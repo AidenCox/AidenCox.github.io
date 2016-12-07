@@ -39,6 +39,7 @@
 		var paddle2;
 		var speed = 13;
 		var angle= 5 ;
+		var joy;
 
         function init(){
             scoreBoard = document.getElementById("scoreBoard");
@@ -65,18 +66,37 @@
             //leaves.setSpeed(0);
             //ribbitMP3 = new Sound("ribbit.mp3");
             //ribbitOGG = new Sound("ribbit.ogg");
+			
+			if (scene.touchable){
+                joy = new Joy();
+            }
 
             setupFlies();
             scene.start();
         } // end init
+		
+		function checkJoy(){
+            //defined here because frog does not
+            //have access to virtual joystick
+            dx = joy.getDiffX();
+            dy = joy.getDiffY();
+            ball.setSpeed((dy * -1) / 5);
+            ball.changeAngleBy(dx / 10);
+        }
     
         function update(){
             scene.clear();
             checkTime();
             //frog.checkKeys();
+			if (scene.touchable){
+                checkJoy();
+            } else {
+                //frog.checkKeys();
+            
 			paddle1.checkKeys();
 			paddle2.checkKeys();
             //leaves.update();
+			}
            
 			//checkCollisions2();
 			checkBounds(); 
