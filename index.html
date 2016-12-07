@@ -1,33 +1,206 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>timing.html</title>
+    <!-- Note I changed the CSS slightly from the book
+         to reflect new default size of canvas 
+         -ajh     
+    -->
+         
+    <style type="text/css">
+        #reset {
+            position: absolute;
+            left: 350px;
+            top: 550px;
+            z-index:100;
+        }
+    </style>
+    <script type="text/javascript"
+            src = "simpleGame.js">
+    </script>
+    <script type = "text/javascript"
+            src = "frogLib.js"></script>
+    <script type="text/javascript">
+        var scene;
+        var frog;
+        var flies;
+        var leaves;
+        var ribbitMP3;
+        var ribbitOGG;
+        var scoreBoard;
+        var hits;
+        var NUMFLIES = 3;
+        var MAXTIME = 300;
+        var timer;
+        var time;
+		var ball;
+		var paddle1;
+		var paddle2;
+		var speed = 13;
+		var angle= 5 ;
+        function init(){
+            scoreBoard = document.getElementById("scoreBoard");
+            hits = 0;
+            timer = new Timer();
+            scene = new Scene();
+			w=window.innerWidth;
+			h=window.innerHeight;
+			scene.setSize(.9*w,.9*h);
+			scene.setPos((w-scene.width)/2,(h-scene.height)/2);
+            scene.setBG("black");
+            //frog = new Frog();
+			ball = new Ball();
+			ball.setPosition((scene.width)/2,scene.height/2);
+			paddle1 = new Paddle1();
+			paddle2 = new Paddle2();
+			topwall = new topWall();
+			paddle1.setPosition(100,(scene.height)/2);
+			paddle2.setPosition((scene.width)-150,(scene.height)/2);
+			topwall.setPosition(950,10);
+			ball.setBoundAction(BOUNCE);
+            //leaves = new Sprite(scene, "leaves.png", 800, 600);
+            //leaves.setPosition(400, 300);
+            //leaves.setSpeed(0);
+            //ribbitMP3 = new Sound("ribbit.mp3");
+            //ribbitOGG = new Sound("ribbit.ogg");
+            setupFlies();
+            scene.start();
+        } // end init
+    
+        function update(){
+            scene.clear();
+            checkTime();
+            //frog.checkKeys();
+			paddle1.checkKeys();
+			paddle2.checkKeys();
+            //leaves.update();
+           
+			//checkCollisions2();
+			checkBounds(); 
+			checkBounds2();
+			checkDistance();
+			//checkBounds();
+            //frog.update();
+			
+			//topwall.update();
+			paddle1.update();
+			paddle2.update();
+			ball.update();
+        } // end update();
+   
+        function setupFlies(){
+            flies = new Array(NUMFLIES);
+            for (i = 0; i < NUMFLIES; i++){
+              flies[i] = new Fly();
+            } // end for
+        } // end setupFlies
+        
+        function checkCollisions(flyNum){
+            if (frog.collidesWith(flies[flyNum])){
+                flies[flyNum].reset();
+                //ribbitMP3.play();
+                //ribbitOGG.play();
+                hits += 1;
+                updateScore();
+            } // end if
+        } // end checkCollisions
+		
+		function checkCollisions2(){
+		if(paddle1.collidesWith(ball)){
+		speed = -speed;
+		//changetheAngle();
+		ball.setSpeed(speed);
+			}
+			
+		if(paddle2.collidesWith(ball)){
+		speed = -speed;
+		//changetheAngle();
+		ball.setSpeed(speed);
+			}
+		}
+		function checkDistance(){
+		if (ball.distanceTo(paddle2) <90 ){
+		speed = -speed;
+		changetheAngle();
+		ball.setSpeed(speed);
+		}
+		if (ball.distanceTo(paddle1) <94 ){
+		speed = -speed;
+		changetheAngle();
+		ball.setSpeed(speed);
+		}
+		}
+		
+		function changetheAngle(){
+		ball.changeAngleBy(angle);
+		angle = angle + 5;
+		}
+		
+		function ballReset(){
+		ball = new Ball();
+		ball.setSpeed(10);
+		ball.setPosition((scene.width)/2,scene.height/2);
+		ball.setBoundAction(BOUNCE);
+		}
+		
+		function checkBounds(){
+		if (ball.x<ball.width/1.7)
+			{
+				ballReset();
+			} //end if
+	
+		if (ball.x>scene.width-50)
+			{
+				ballReset();
+			} //end if
+			
+		//ball1.checkPaddles();	
+		}
+		
+		function checkCollisions3(){
+		
+		
+		}
+		
+		function checkBounds2(){
+		if(ball.distanceTo(topwall)<15){
+		//speed = -speed;
+		//changetheAngle();
+		angle = -angle;
+		ball.changeAngleBy(angle);
+		//ball.setSpeed(speed);
+		}
+		}
+        
+        function updateScore(){
+            //update the scoreboard
+            scoreBoard.innerHTML = "Hits: " + hits + ". Time: " + time;
+        } // end updateScore
+        
+        function checkTime(){
+            time = timer.getElapsedTime();
+            if (time > MAXTIME){
+                scene.stop();
+            } // end if
+            updateScore();
+        } // end checkTime
+        
+        function restart(){
+            document.location.href = "";
+        } // end restart
+        
+    </script>
+    
+</head>
+<body onload = "init()">
+    <div id = "scoreBoard">Hits: 0</div>
+    <div id = "reset">
+        <button type = "button"
+                onclick = "restart()">
+            Play again
+        </button>
+    </div>
+</body>
 
-    <!-- Bootstrap -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <center>
-  <body>
-    <img src="/home/student/CSE 199/Beginning WebPage/Photos/jerry.jpg" width="15%" height="15%">
-    <h1>Hey guys, it's Aiden!</h1>
-		<img src="/home/student/CSE 199/Beginning WebPage/Gifs/jerryLayHeader.gif">
-    <img src="/home/student/CSE 199/Beginning WebPage/Photos/jerry.jpg" width="15%" height="15%">
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  </body>
-</center>
 </html>
