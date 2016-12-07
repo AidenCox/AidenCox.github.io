@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>timing.html</title>
+    <!-- Note I changed the CSS slightly from the book
+         to reflect new default size of canvas 
+         -ajh     
+    -->
+         
+    <style type="text/css">
+        #reset {
+            position: absolute;
+            left: 350px;
+            top: 550px;
+            z-index:100;
+        }
+    </style>
+    <script type="text/javascript"
+            src = "simpleGame.js">
+    </script>
+    <script type = "text/javascript"
+            src = "frogLib.js"></script>
+    <script type="text/javascript">
+        var scene;
+        var frog;
+        var flies;
+        var leaves;
+        var ribbitMP3;
+        var ribbitOGG;
+        var scoreBoard;
+        var hits;
+        var NUMFLIES = 3;
+        var MAXTIME = 300;
+        var timer;
+        var time;
+		var ball;
+		var paddle1;
+		var paddle2;
+		var speed = 13;
+		var angle= 5 ;
+
+        function init(){
+            scoreBoard = document.getElementById("scoreBoard");
+            hits = 0;
+            timer = new Timer();
+            scene = new Scene();
+			w=window.innerWidth;
+			h=window.innerHeight;
+			scene.setSize(.9*w,.9*h);
+			scene.setPos((w-scene.width)/2,(h-scene.height)/2);
+            scene.setBG("black");
+            //frog = new Frog();
+			ball = new Ball();
+			ball.setPosition((scene.width)/2,scene.height/2);
+			paddle1 = new Paddle1();
+			paddle2 = new Paddle2();
+			topwall = new topWall();
+			paddle1.setPosition(100,(scene.height)/2);
+			paddle2.setPosition((scene.width)-150,(scene.height)/2);
+			topwall.setPosition(950,10);
+			ball.setBoundAction(BOUNCE);
+            //leaves = new Sprite(scene, "leaves.png", 800, 600);
+            //leaves.setPosition(400, 300);
+            //leaves.setSpeed(0);
+            //ribbitMP3 = new Sound("ribbit.mp3");
+            //ribbitOGG = new Sound("ribbit.ogg");
+
+            setupFlies();
+            scene.start();
+        } // end init
+    
+        function update(){
+            scene.clear();
+            checkTime();
+            //frog.checkKeys();
+			paddle1.checkKeys();
+			paddle2.checkKeys();
+            //leaves.update();
+           
+			//checkCollisions2();
+			checkBounds(); 
+			checkBounds2();
+			checkDistance();
+			//checkBounds();
+            //frog.update();
+			
+			//topwall.update();
+			paddle1.update();
+			paddle2.update();
+			ball.update();
+        } // end update();
+   
+        function setupFlies(){
+            flies = new Array(NUMFLIES);
+            for (i = 0; i < NUMFLIES; i++){
+              flies[i] = new Fly();
+            } // end for
+        } // end setupFlies
+        
+        function checkCollisions(flyNum){
+            if (frog.collidesWith(flies[flyNum])){
+                flies[flyNum].reset();
+                //ribbitMP3.play();
+                //ribbitOGG.play();
+                hits += 1;
+                updateScore();
+            } // end if
+        } // end checkCollisions
+		
+		function checkCollisions2(){
+		if(paddle1.collidesWith(ball)){
+		speed = -speed;
+		//changetheAngle();
+		ball.setSpeed(speed);
+			}
+			
+		if(paddle2.collidesWith(ball)){
+		speed = -speed;
+		//changetheAngle();
+		ball.setSpeed(speed);
+			}
+		}
+		function checkDistance(){
+		if (ball.distanceTo(paddle2) <90 ){
+		speed = -speed;
+		changetheAngle();
+		ball.setSpeed(speed);
+		}
+		if (ball.distanceTo(paddle1) <94 ){
+		speed = -speed;
+		changetheAngle();
+		ball.setSpeed(speed);
+		}
+		}
+		
+		function changetheAngle(){
+		ball.changeAngleBy(angle);
+		angle = angle + 5;
+		}
+		
+		function ballReset(){
+		ball = new Ball();
+		ball.setSpeed(10);
+		ball.setPosition((scene.width)/2,scene.height/2);
+		ball.setBoundAction(BOUNCE);
+		}
+		
+		function checkBounds(){
+		if (ball.x<ball.width/1.7)
+			{
+				ballReset();
+			} //end if
+	
+		if (ball.x>scene.width-50)
+			{
+				ballReset();
+			} //end if
+			
+		//ball1.checkPaddles();	
+		}
+		
+		function checkCollisions3(){
+		
+		
+		}
+		
+		function checkBounds2(){
+		if(ball.distanceTo(topwall)<15){
+		//speed = -speed;
+		//changetheAngle();
+		angle = -angle;
+		ball.changeAngleBy(angle);
+		//ball.setSpeed(speed);
+		}
+		}
+        
+        function updateScore(){
+            //update the scoreboard
+            scoreBoard.innerHTML = "Hits: " + hits + ". Time: " + time;
+        } // end updateScore
+        
+        function checkTime(){
+            time = timer.getElapsedTime();
+            if (time > MAXTIME){
+                scene.stop();
+            } // end if
+            updateScore();
+
+        } // end checkTime
+        
+        function restart(){
+            document.location.href = "";
+        } // end restart
+        
+    </script>
+    
+</head>
+<body onload = "init()">
+    <div id = "scoreBoard">Hits: 0</div>
+    <div id = "reset">
+        <button type = "button"
+                onclick = "restart()">
+            Play again
+        </button>
+    </div>
+</body>
+
+</html>
