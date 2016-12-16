@@ -70,7 +70,6 @@
             checkTime();
 			if (scene.touchable){
                 checkJoy();
-				newPlayer();
             } else {
             
 			paddle1.checkKeys();
@@ -106,25 +105,6 @@
                 ball.setDY(dy);
             } 
 		}
-		
-		function autoMove(){
-		 V_SPEED = 1;
-        BRAINS = .2;
-		paddle2.setImgAngle(90);
-            
-            
-            if (Math.random() < BRAINS){
-               
-                deltaDiff = Math.abs(this.y = ball.y);
-                    if (paddle2.y > ball.y){
-                      paddle2.setMoveAngle(0);
-                    } else {
-                        paddle2.setMoveAngle(180);
-                    }
-                paddle2.setSpeed(V_SPEED);
-		
-		}
-		}
 
 		
 		function ballReset(){
@@ -152,7 +132,7 @@
         
         function updateScore(){
             
-            scoreBoard.innerHTML = "Player 1: " + rightScore + " Player 2: " + leftScore +". Time: " + time;
+            scoreBoard.innerHTML = "Player 1: " + rightScore + " Player 2: " + leftScore +" Time: " + time;
         } 
         
         function checkTime(){
