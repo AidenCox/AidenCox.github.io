@@ -52,8 +52,8 @@ function Paddle2(){
             this.changeSpeedBy(1);
             if (this.speed > this.maxSpeed){
                 this.setSpeed(this.maxSpeed);
-            } // end if
-        } // end if
+            }
+        } 
         if (keysDown[K_DOWN]){
             this.changeSpeedBy(-1);
             if (this.speed < this.minSpeed){
