@@ -16,11 +16,10 @@
             src = "simpleGame.js">
     </script>
     <script type = "text/javascript"
-            src = "frogLib.js"></script>
+            src = "pongLib.js"></script>
     <script type="text/javascript">
         var scene;
         var scoreBoard;
-        var hits;
 		var leftScore;
 		var rightScore;
         var NUMFLIES = 3;
@@ -113,37 +112,20 @@
         BRAINS = .2;
 		paddle2.setImgAngle(90);
             
-            //don't move on every turn
+            
             if (Math.random() < BRAINS){
-                //ignore small differences
+               
                 deltaDiff = Math.abs(this.y = ball.y);
                     if (paddle2.y > ball.y){
                       paddle2.setMoveAngle(0);
                     } else {
                         paddle2.setMoveAngle(180);
-                    } // end if
+                    }
                 paddle2.setSpeed(V_SPEED);
 		
 		}
 		}
-		
-		function checkDistance(){
-		if (ball.distanceTo(paddle2) <90 ){
-		speed = -speed;
-		changetheAngle();
-		ball.setSpeed(speed);
-		}
-		if (ball.distanceTo(paddle1) <94 ){
-		speed = -speed;
-		changetheAngle();
-		ball.setSpeed(speed);
-		}
-		}
-		
-		function changetheAngle(){
-		ball.changeAngleBy(angle);
-		angle = angle + 5;
-		}
+
 		
 		function ballReset(){
 		ball = new Ball();
@@ -175,7 +157,10 @@
         
         function checkTime(){
             time = timer.getElapsedTime();
-            if (time > MAXTIME){
+            if (leftScore > 4){
+                scene.stop();
+            } 
+			if (rightScore > 4){
                 scene.stop();
             } 
             updateScore();
@@ -190,13 +175,12 @@
     
 </head>
 <body onload = "init()">
-    <div id = "scoreBoard">Hits: 0</div>
-	<div style="position: relative;width: 1500px; height: 30px;">    
-
-    <div style="position: absolute; bottom: 5px;">
-	Use 'W' and 'S' to control the left paddle and the arrow keys for the right paddle.
+    
+    <div style="position: absolute; top: 25px;">
+	Use 'W' and 'S' to control the left paddle and the arrow keys for the right paddle. The first person to five wins!
     This game was inspired by pong and created using the simpleGame.js library.
     </div>
+	<div id = "scoreBoard">Hits: 0</div>
 </div>
 </body>
 
