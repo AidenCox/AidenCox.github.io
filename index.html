@@ -2,11 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>timing.html</title>
-    <!-- Note I changed the CSS slightly from the book
-         to reflect new default size of canvas 
-         -ajh     
-    -->
+    <title>PongGame.html</title>
          
     <style type="text/css">
         #reset {
@@ -23,13 +19,10 @@
             src = "frogLib.js"></script>
     <script type="text/javascript">
         var scene;
-        var frog;
-        var flies;
-        var leaves;
-        var ribbitMP3;
-        var ribbitOGG;
         var scoreBoard;
         var hits;
+		var leftScore;
+		var rightScore;
         var NUMFLIES = 3;
         var MAXTIME = 300;
         var timer;
@@ -37,12 +30,16 @@
 		var ball;
 		var paddle1;
 		var paddle2;
+		var player;
 		var speed = 13;
 		var angle= 5 ;
 		var joy;
+
         function init(){
             scoreBoard = document.getElementById("scoreBoard");
             hits = 0;
+			leftScore = 0;
+			rightScore = 0;
             timer = new Timer();
             scene = new Scene();
 			w=window.innerWidth;
@@ -50,97 +47,86 @@
 			scene.setSize(.9*w,.9*h);
 			scene.setPos((w-scene.width)/2,(h-scene.height)/2);
             scene.setBG("black");
-            //frog = new Frog();
 			ball = new Ball();
 			ball.setPosition((scene.width)/2,scene.height/2);
 			paddle1 = new Paddle1();
 			paddle2 = new Paddle2();
-			topwall = new topWall();
 			paddle1.setPosition(100,(scene.height)/2);
 			paddle2.setPosition((scene.width)-150,(scene.height)/2);
-			topwall.setPosition(950,10);
 			ball.setBoundAction(BOUNCE);
-            //leaves = new Sprite(scene, "leaves.png", 800, 600);
-            //leaves.setPosition(400, 300);
-            //leaves.setSpeed(0);
-            //ribbitMP3 = new Sound("ribbit.mp3");
-            //ribbitOGG = new Sound("ribbit.ogg");
-			
-		if (scene.touchable){
-			paddle1.maxSpeed(20);
-			paddle1.minSpeed(20);
+			if (scene.touchable){
                 joy = new Joy();
             }
-            setupFlies();
             scene.start();
-        } // end init
+        }
 		
 		function checkJoy(){
-            //defined here because frog does not
-            //have access to virtual joystick
             dx = joy.getDiffX();
             dy = joy.getDiffY();
             paddle1.setSpeed((dy * -1) / 5);
-            //ball.changeAngleBy(dx / 10);
         }
     
         function update(){
             scene.clear();
             checkTime();
-            //frog.checkKeys();
 			if (scene.touchable){
                 checkJoy();
+				newPlayer();
             } else {
-                //frog.checkKeys();
             
 			paddle1.checkKeys();
 			paddle2.checkKeys();
-            //leaves.update();
 			}
            
-			//checkCollisions2();
+			checkCollisions3();
 			checkBounds(); 
-			checkBounds2();
-			checkDistance();
-			//checkBounds();
-            //frog.update();
-			
-			//topwall.update();
 			paddle1.update();
 			paddle2.update();
 			ball.update();
-        } // end update();
-   
-        function setupFlies(){
-            flies = new Array(NUMFLIES);
-            for (i = 0; i < NUMFLIES; i++){
-              flies[i] = new Fly();
-            } // end for
-        } // end setupFlies
-        
-        function checkCollisions(flyNum){
-            if (frog.collidesWith(flies[flyNum])){
-                flies[flyNum].reset();
-                //ribbitMP3.play();
-                //ribbitOGG.play();
-                hits += 1;
-                updateScore();
-            } // end if
-        } // end checkCollisions
+        } 
 		
-		function checkCollisions2(){
-		if(paddle1.collidesWith(ball)){
-		speed = -speed;
-		//changetheAngle();
-		ball.setSpeed(speed);
-			}
-			
-		if(paddle2.collidesWith(ball)){
-		speed = -speed;
-		//changetheAngle();
-		ball.setSpeed(speed);
-			}
+		
+		function checkCollisions3(){
+		MAX = 7;
+		 if (ball.collidesWith(paddle2)){
+                ball.setDX(ball.dx * -1);            
+            
+                dy = ball.y - paddle2.y;
+                dy = ((dy / paddle2.height) );
+                console.log("dy: " + dy);
+                dy *= MAX;
+                ball.setDY(dy);
+            } 
+			if (ball.collidesWith(paddle1)){
+                ball.setDX(ball.dx * -1);            
+            
+                dy = ball.y - paddle1.y;
+                dy = ((dy / paddle1.height) );
+                console.log("dy: " + dy);
+                dy *= MAX;
+                ball.setDY(dy);
+            } 
 		}
+		
+		function autoMove(){
+		 V_SPEED = 1;
+        BRAINS = .2;
+		paddle2.setImgAngle(90);
+            
+            //don't move on every turn
+            if (Math.random() < BRAINS){
+                //ignore small differences
+                deltaDiff = Math.abs(this.y = ball.y);
+                    if (paddle2.y > ball.y){
+                      paddle2.setMoveAngle(0);
+                    } else {
+                        paddle2.setMoveAngle(180);
+                    } // end if
+                paddle2.setSpeed(V_SPEED);
+		
+		}
+		}
+		
 		function checkDistance(){
 		if (ball.distanceTo(paddle2) <90 ){
 		speed = -speed;
@@ -169,60 +155,49 @@
 		function checkBounds(){
 		if (ball.x<ball.width/1.7)
 			{
+				leftScore += 1;
 				ballReset();
-			} //end if
+			} 
 	
 		if (ball.x>scene.width-50)
 			{
+				rightScore += 1;
 				ballReset();
-			} //end if
-			
-		//ball1.checkPaddles();	
+			} 	
 		}
 		
-		function checkCollisions3(){
-		
-		
-		}
-		
-		function checkBounds2(){
-		if(ball.distanceTo(topwall)<15){
-		//speed = -speed;
-		//changetheAngle();
-		angle = -angle;
-		ball.changeAngleBy(angle);
-		//ball.setSpeed(speed);
-		}
-		}
+
         
         function updateScore(){
-            //update the scoreboard
-            scoreBoard.innerHTML = "Hits: " + hits + ". Time: " + time;
-        } // end updateScore
+            
+            scoreBoard.innerHTML = "Player 1: " + rightScore + " Player 2: " + leftScore +". Time: " + time;
+        } 
         
         function checkTime(){
             time = timer.getElapsedTime();
             if (time > MAXTIME){
                 scene.stop();
-            } // end if
+            } 
             updateScore();
-        } // end checkTime
+
+        } 
         
         function restart(){
             document.location.href = "";
-        } // end restart
+        } 
         
     </script>
     
 </head>
 <body onload = "init()">
     <div id = "scoreBoard">Hits: 0</div>
-    <div id = "reset">
-        <button type = "button"
-                onclick = "restart()">
-            Play again
-        </button>
+	<div style="position: relative;width: 1500px; height: 30px;">    
+
+    <div style="position: absolute; bottom: 5px;">
+	Use 'W' and 'S' to control the left paddle and the arrow keys for the right paddle.
+    This game was inspired by pong and created using the simpleGame.js library.
     </div>
+</div>
 </body>
 
 </html>
